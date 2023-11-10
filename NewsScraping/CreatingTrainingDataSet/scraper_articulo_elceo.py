@@ -5,18 +5,9 @@ from bs4 import BeautifulSoup
 from newspaper import Config, Article
 import re
 
-urls = ['https://www.eleconomista.com.mx/seccion/empresas',
-'https://www.eleconomista.com.mx/seccion/economia',
-'https://www.eleconomista.com.mx/seccion/mercados',
-'https://www.eleconomista.com.mx/seccion/sectorfinanciero',
-'https://www.eleconomista.com.mx/seccion/estados',
-'https://www.eleconomista.com.mx/seccion/politica',
-'https://www.eleconomista.com.mx/seccion/energia',
-'https://www.eleconomista.com.mx/seccion/finanzaspersonales',
-'https://www.eleconomista.com.mx/seccion/internacionales',
-'https://www.eleconomista.com.mx/capital-humano',
-'https://www.eleconomista.com.mx/seccion/tecnologia',
-'https://www.eleconomista.com.mx/seccion/estados']
+urls = ['https://elceo.com/negocios/',
+'https://elceo.com/mercados/',
+'https://elceo.com/economia/']
 
 url_stub = 'https://www.eleconomista.com.mx/seccion' # BeautifulSoup jala links relativos, agregamos el stub para hacerlo absoluto
 user_agent_string = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
@@ -39,12 +30,11 @@ with open(csv_file_name, mode='a', newline='', encoding='utf-8') as file:
         html_pagina = response.content
 
         soup = BeautifulSoup(html_pagina, 'html.parser')
-        links_articulos = soup.select('a.jsx-578919967') # Esto solo jala para eleconomista
+        links_articulos = soup.select('a.post-link') # Esto solo jala para eleconomista
 
         for link in links_articulos:
             try:
-                relative_url = link.get('href')
-                article_url = url_stub + relative_url
+                article_url = link.get('href')
                 article = Article(article_url, config=config)
                 article.download()
                 article.parse()
