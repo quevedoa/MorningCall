@@ -5,20 +5,9 @@ from bs4 import BeautifulSoup
 from newspaper import Config, Article
 import re
 
-urls = ['https://www.eleconomista.com.mx/seccion/empresas',
-'https://www.eleconomista.com.mx/seccion/economia',
-'https://www.eleconomista.com.mx/seccion/mercados',
-'https://www.eleconomista.com.mx/seccion/sectorfinanciero',
-'https://www.eleconomista.com.mx/seccion/estados',
-'https://www.eleconomista.com.mx/seccion/politica',
-'https://www.eleconomista.com.mx/seccion/energia',
-'https://www.eleconomista.com.mx/seccion/finanzaspersonales',
-'https://www.eleconomista.com.mx/seccion/internacionales',
-'https://www.eleconomista.com.mx/capital-humano',
-'https://www.eleconomista.com.mx/seccion/tecnologia',
-'https://www.eleconomista.com.mx/seccion/estados']
+urls = ['https://www.forbes.com.mx/negocios/',
+'https://www.forbes.com.mx/economia-y-finanzas/']
 
-url_stub = 'https://www.eleconomista.com.mx/seccion' # BeautifulSoup jala links relativos, agregamos el stub para hacerlo absoluto
 user_agent_string = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
 
 config = Config()
@@ -39,13 +28,29 @@ with open(csv_file_name, mode='a', newline='', encoding='utf-8') as file:
         html_pagina = response.content
 
         soup = BeautifulSoup(html_pagina, 'html.parser')
-        links_articulos = soup.select('a.jsx-578919967') # Esto solo jala para eleconomista
+
+        divs = soup.find_all('div', class_='f4_segment__block__right')
+        links_articulos = []
+
+        # Iterate through each 'div' to find 'a' tags and extract 'href'.
+        for div in divs:
+            a_tag = div.find('h3')  # Find the 'a' tag within the 'div'.
+            a_tag = a_tag.find('a')
+            if a_tag and a_tag.has_attr('href'):
+                links_articulos.append(a_tag['href'])  # Get the 'href' attribute.
+
+        divs = soup.find_all('article', class_='f4_category-header__top__left__article')
+
+        # Iterate through each 'div' to find 'a' tags and extract 'href'.
+        for div in divs:
+            a_tag = div.find('h2')  # Find the 'a' tag within the 'div'.
+            a_tag = a_tag.find('a')
+            if a_tag and a_tag.has_attr('href'):
+                links_articulos.append(a_tag['href'])  # Get the 'href' attribute.
 
         for link in links_articulos:
             try:
-                relative_url = link.get('href')
-                article_url = url_stub + relative_url
-                article = Article(article_url, config=config)
+                article = Article(link, config=config)
                 article.download()
                 article.parse()
 
@@ -53,8 +58,8 @@ with open(csv_file_name, mode='a', newline='', encoding='utf-8') as file:
                 fecha = str(article.publish_date)
                 texto = re.sub(r'[^\S ]+', '', article.text)
 
-                writer.writerow([titulo, fecha, texto, article_url])
-                print(f"Article ({article_count}): {titulo} - {article_url}")
+                writer.writerow([titulo, fecha, texto, link])
+                print(f"Article ({article_count}): {titulo} - {link}")
                 article_count += 1
             except Exception as e:
                 print(f"Valio verga {url}: {e}")
