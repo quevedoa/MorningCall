@@ -16,15 +16,26 @@ config = Config()
 config.browser_user_agent = user_agent_string
 headers = {'User-Agent': user_agent_string}
 
-csv_file_name = 'articulos.csv'
+# csv_file_name = 'articulos.csv'
+csv_file_name = '/Users/quevedo/Documents/ITAM/Tesis/MorningCall/NewsScraping/CreatingTrainingDataSet/CSVDeArticulos/articulos_elfinanciero.csv'
+parsed_urls_file_name = '/Users/quevedo/Documents/ITAM/Tesis/MorningCall/NewsScraping/CreatingTrainingDataSet/parsed_urls.txt'
 
 # Descomenta la siguiente linea si no sabes wtf going on
 # logging.basicConfig(level=logging.DEBUG)
 
+# Checa todos los urls que ya leyó
+url_set = set()
+with open(parsed_urls_file_name,'r') as file:
+    for line in file:
+        url = line.strip()
+        if url:
+            url_set.add(url)
+
+article_count = 0
 with open(csv_file_name, mode='a', newline='', encoding='utf-8') as file:
     writer = csv.writer(file)
 
-    article_count = 1
+    new_urls = []
     for url in urls:
         response = requests.get(url, headers=headers)
         html_pagina = response.content
@@ -42,28 +53,40 @@ with open(csv_file_name, mode='a', newline='', encoding='utf-8') as file:
         divs = soup.select('a.simple-list-headline-anchor')
 
         for div in divs:
-           links_articulos.append(div['href'])  # Get the 'href' attribute.
+            links_articulos.append(div['href'])  # Get the 'href' attribute.
 
         divs = soup.select('a.sm-promo-headline')
 
         for div in divs:
-           links_articulos.append(div['href'])  # Get the 'href' attribute.
+            links_articulos.append(div['href'])  # Get the 'href' attribute.
 
         for link in links_articulos:
             try:
                 url = url_stub + link
-                article = Article(url, config=config)
-                article.download()
-                article.parse()
+                if url not in url_set:
+                    url_set.add(url)
+                    new_urls.append(url)
 
-                titulo = article.title
-                fecha = str(article.publish_date)
-                texto = re.sub(r'[^\S ]+', '', article.text)
+                    article = Article(url, config=config)
+                    article.download()
+                    article.parse()
 
-                writer.writerow([titulo, fecha, texto, url])
-                print(f"Article ({article_count}): {titulo} - {url}")
-                article_count += 1
+                    titulo = article.title
+                    fecha = str(article.publish_date)
+                    texto = re.sub(r'[^\S ]+', '', article.text)
+
+                    writer.writerow([titulo, fecha, texto, url])
+                    article_count += 1
+                    print(f"Article ({article_count}): {titulo} - {url}")
             except Exception as e:
                 print(f"Valio verga {url}: {e}")
+
+with open(parsed_urls_file_name,'a') as file:
+    for url in new_urls:
+        file.write(f"{url}\n")
+
+CronLogFileName = '/Users/quevedo/Documents/ITAM/Tesis/MorningCall/NewsScraping/CreatingTrainingDataSet/ScrapingCronJob.log'
+with open(CronLogFileName, 'a') as file:
+    file.write(f"\t\tEl Financiero: {article_count} artículos scraped")
 
 print(f"SUCCESS. Se guardo todo en {csv_file_name}")

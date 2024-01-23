@@ -14,15 +14,26 @@ config = Config()
 config.browser_user_agent = user_agent_string
 headers = {'User-Agent': user_agent_string}
 
-csv_file_name = 'articulos.csv'
+# csv_file_name = 'articulos.csv'
+csv_file_name = '/Users/quevedo/Documents/ITAM/Tesis/MorningCall/NewsScraping/CreatingTrainingDataSet/CSVDeArticulos/articulos_forbes.csv'
+parsed_urls_file_name = '/Users/quevedo/Documents/ITAM/Tesis/MorningCall/NewsScraping/CreatingTrainingDataSet/parsed_urls.txt'
 
 # Descomenta la siguiente linea si no sabes wtf going on
 # logging.basicConfig(level=logging.DEBUG)
 
+# Checa todos los urls que ya leyó
+url_set = set()
+with open(parsed_urls_file_name,'r') as file:
+    for line in file:
+        url = line.strip()
+        if url:
+            url_set.add(url)
+
+article_count = 0
 with open(csv_file_name, mode='a', newline='', encoding='utf-8') as file:
     writer = csv.writer(file)
 
-    article_count = 1
+    new_urls = []
     for url in urls:
         response = requests.get(url, headers=headers)
         html_pagina = response.content
@@ -49,19 +60,31 @@ with open(csv_file_name, mode='a', newline='', encoding='utf-8') as file:
                 links_articulos.append(a_tag['href'])  # Get the 'href' attribute.
 
         for link in links_articulos:
-            try:
-                article = Article(link, config=config)
-                article.download()
-                article.parse()
+            if link not in url_set:
+                try:
+                    url_set.add(link)
+                    new_urls.append(link)
 
-                titulo = article.title
-                fecha = str(article.publish_date)
-                texto = re.sub(r'[^\S ]+', '', article.text)
+                    article = Article(link, config=config)
+                    article.download()
+                    article.parse()
 
-                writer.writerow([titulo, fecha, texto, link])
-                print(f"Article ({article_count}): {titulo} - {link}")
-                article_count += 1
-            except Exception as e:
-                print(f"Valio verga {url}: {e}")
+                    titulo = article.title
+                    fecha = str(article.publish_date)
+                    texto = re.sub(r'[^\S ]+', '', article.text)
+
+                    writer.writerow([titulo, fecha, texto, link])
+                    article_count += 1
+                    print(f"Article ({article_count}): {titulo} - {link}")
+                except Exception as e:
+                    print(f"Valio verga {url}: {e}")
+
+with open(parsed_urls_file_name,'a') as file:
+    for url in new_urls:
+        file.write(f"{url}\n")
+
+CronLogFileName = '/Users/quevedo/Documents/ITAM/Tesis/MorningCall/NewsScraping/CreatingTrainingDataSet/ScrapingCronJob.log'
+with open(CronLogFileName, 'a') as file:
+    file.write(f"\t\tForbes: {article_count} artículos scraped")
 
 print(f"SUCCESS. Se guardo todo en {csv_file_name}")
