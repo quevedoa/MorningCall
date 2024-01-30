@@ -1,0 +1,32 @@
+.custom-hero-bg {
+    background-color: #faedcd;
+}
+
+.custom-navbar-bg {
+    background-color: #d4a373;
+}
+
+.navbar-item {
+    color: #fefae0;
+}
+.navbar-item:hover {
+    background-color: #ccd5ae;
+}
+
+.navbar-logo img {
+    max-height: 400px;
+}
+
+.playfair-display-title {
+    font-family: "Playfair Display", serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+  }
+
+  .playfair-display-title-big {
+    font-family: "Playfair Display", serif;
+    font-weight: 600;
+    font-style: normal;
+    font-size: 100px;
+  }

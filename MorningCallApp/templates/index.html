@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Morning Call</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='custom_styles.css') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='logo.png') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar is-primary" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <!-- Website Logo -->
+            <a class="navbar-item" href="/">
+                <img class="navbar-logo" src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+            </a>
+        </div>
+
+        <!-- Menu Items -->
+        <div class="navbar-menu custom-navbar-bg">
+            <div class="navbar-menu">
+                <a class="navbar-item" href="/">Home</a>
+                <a class="navbar-item" href="/about">About</a>
+                <a class="navbar-item" href="/contact">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero custom-hero-bg">
+        <div class="hero-body">
+            <div class="container">
+                <div class="columns is-vcentered">
+                    <div class="column is-flex is-flex-direction-column is-justify-content-center">
+                        <p class="title is-size-1 has-text-centered playfair-display-title-big">The Morning Call</p>
+                        <p class="title is-size-1 has-text-centered playfair-display-title-big">{{ date }}</p>
+                    </div>
+
+                    <div class="column">
+                        <canvas id="industryPieChart"></canvas>
+                        <script>
+                            const ctx = document.getElementById('industryPieChart').getContext('2d');
+                            const industryPieChart = new Chart(ctx, {
+                                type: 'pie',
+                                data: {
+                                    labels: {{ industries | tojson }},
+                                    datasets: [{
+                                        data: {{ industry_percentage | tojson }},
+                                        backgroundColor: [
+                                            'red', 'blue', 'green', 'yellow', 'purple'
+                                        ]
+                                    }],
+                                },
+                            })
+                        </script>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            {% for article in articles %}
+                <div class="box">
+                    <article class="media">
+                        {% if article.image_url %}
+                            <figure class="media-left">
+                                <p class="image is-64x64">
+                                    <img src="{{ article.image_url }}" alt="Article Image">
+                                </p>
+                            </figure>
+                        {% endif %}
+                        <div class="media-content">
+                            <div class="content">
+                                <p>
+                                    <strong>{{ article.rating }} {{ article.title }}</strong> <br>
+                                    <small>{{ article.category }}</small> <br>
+                                    {{ article.summary }}
+                                </p>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <!-- <footer class="footer">
+        <div class="content has-text-centered">
+            <p>&copy; {{ current_year }} Financial News Portal. All rights reserved.</p>
+        </div>
+    </footer> -->
+</body>
+</html>
