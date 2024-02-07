@@ -22,11 +22,25 @@
     font-optical-sizing: auto;
     font-weight: 600;
     font-style: normal;
-  }
+}
 
-  .playfair-display-title-big {
+.playfair-display-title-big {
     font-family: "Playfair Display", serif;
     font-weight: 600;
     font-style: normal;
     font-size: 100px;
-  }
+}
+
+.article-link {
+    color: inherit; /* Prevent changing text color */
+    text-decoration: none; /* Remove underline from links */
+    display: block; /* Make the link behave like a block element */
+    margin-bottom: 1rem; /* Add space between cards */
+}
+
+.article-link:hover .box {
+    background-color: #f0f0f0; /* Light grey background on hover */
+    border-color: #e0e0e0; /* Slightly darker border to stand out */
+    /* Optional: add a box-shadow for more depth */
+    box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+}

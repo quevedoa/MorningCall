@@ -1,0 +1,11 @@
+{
+    "DATABASE_INFO": {
+        "DB_USER": "andresymariano",
+        "DB_PASS": "peepeepoopoo69420",
+        "DB_HOST": "morningcalldb.cziw8o4acz4c.us-east-2.rds.amazonaws.com",
+        "DB_NAME": "morningcalldb"
+    },
+    "OPENAI_API": {
+        "key": "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"
+    }
+}

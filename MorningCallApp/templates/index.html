@@ -6,6 +6,7 @@
     <title>The Morning Call</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='custom_styles.css') }}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
     <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='logo.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,7 +29,7 @@
             <div class="navbar-menu">
                 <a class="navbar-item" href="/">Home</a>
                 <a class="navbar-item" href="/about">About</a>
-                <a class="navbar-item" href="/contact">Contact</a>
+                <a class="navbar-item" href="/contact" target="_blank">Contact</a>
             </div>
         </div>
     </nav>
@@ -53,11 +54,42 @@
                                     labels: {{ industries | tojson }},
                                     datasets: [{
                                         data: {{ industry_percentage | tojson }},
-                                        backgroundColor: [
-                                            'red', 'blue', 'green', 'yellow', 'purple'
-                                        ]
+                                        backgroundColor: {{ pie_chart_colors | tojson }}
                                     }],
                                 },
+                                options: {
+                                    plugins: {
+                                        tooltip: {
+                                            enabled: true, // Enable tooltips
+                                            backgroundColor: '#FFF', // Tooltip background color
+                                            bodyColor: '#000', // Tooltip text color
+                                            borderColor: '#FFF', // Tooltip border color
+                                            borderWidth: 1, // Tooltip border width
+                                            bodyFont: {
+                                                size: 14, // Tooltip font size
+                                                family: 'Playfair Display', // Tooltip font family
+                                                style: 'bold', // Tooltip font style
+                                            },
+                                            callbacks: {
+                                                label: function(context) {
+                                                    let label = context.label || '';
+
+                                                    if (label) {
+                                                        label += ': ';
+                                                    }
+                                                    if (context.parsed !== null) {
+                                                        label += context.parsed + '%'; // Customizing the label
+                                                    }
+                                                    return label;
+                                                }
+                                            }
+                                        },
+
+                                        legend: {
+                                            display: false // This will hide the legend
+                                        }
+                                    },
+                                }
                             })
                         </script>
                     </div>
@@ -70,29 +102,34 @@
     <section class="section">
         <div class="container">
             {% for article in articles %}
-                <div class="box">
-                    <article class="media">
-                        {% if article.image_url %}
-                            <figure class="media-left">
-                                <p class="image is-64x64">
-                                    <img src="{{ article.image_url }}" alt="Article Image">
-                                </p>
-                            </figure>
-                        {% endif %}
-                        <div class="media-content">
-                            <div class="content">
-                                <p>
-                                    <strong>{{ article.rating }} {{ article.title }}</strong> <br>
-                                    <small>{{ article.category }}</small> <br>
-                                    {{ article.summary }}
-                                </p>
+                <a href="{{ article.url }}" target="_blank" class="article-link">
+                    <div class="box">
+                        <article class="media">
+                            <div class="media-content">
+                                <div class="columns is-mobile is-variable is-8">
+                                    <div class="column is-three-quarters">
+                                        <p class="title is-4">{{ article.title }}</p>
+                                        <p class="subtitle is-6">
+                                            <span class="icon has-text-warning"><i class="fas fa-star"></i></span>
+                                            {{ article.rating }} | {{ article.industry }}
+                                        </p>
+                                    </div>
+                                    <div class="column">
+                                        <p class="has-text-right" style="color: rgba(0,0,0,0.5);">{{ article.source }}</p>
+                                    </div>
+                                </div>
+                                <div class="content">
+                                    <p>{{ article.summary }}</p>
+                                </div>
                             </div>
-                        </div>
-                    </article>
-                </div>
+                        </article>
+                    </div>
+                </a>
             {% endfor %}
         </div>
     </section>
+    
+    
 
     <!-- Footer -->
     <!-- <footer class="footer">
