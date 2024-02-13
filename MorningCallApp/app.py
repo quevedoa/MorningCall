@@ -11,7 +11,7 @@ import pytz
 load_dotenv()
 
 app = Flask(__name__)
-with open("config.json") as config_file:
+with open("/Users/quevedo/Documents/ITAM/Tesis/MorningCall/MorningCallApp/config.json") as config_file:
     config = json.load(config_file)
 
 @app.route('/')
@@ -23,7 +23,8 @@ def home():
     #  WHERE date_of_appearance = {get_current_date_CST()}
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute(f'SELECT * FROM final_articles WHERE date_of_appearance = "{get_current_date_CST()}" ORDER BY rating DESC;');
+    # cursor.execute(f'SELECT * FROM final_articles WHERE date_of_appearance = "{get_current_date_CST()}" ORDER BY rating DESC;');
+    cursor.execute(f'SELECT * FROM final_articles ORDER BY rating DESC;');
     articles = cursor.fetchall()
 
     cursor.close()
