@@ -2,6 +2,8 @@
 
 welcome to the MorningCall, where we yeet through the noise and bring you the bussin' financial news that hits different. whether you're a financial guru or just tryna make sense of where to drop your dough, we gotchu.
 
+Link to website -> [MorningCall](http://morningcallebapp-env.eba-9zdjjfhp.us-east-2.elasticbeanstalk.com/)
+
 ## What's the Vibe? 🤔
 this webapp is all about giving you the tea on the stock market without the snooze fest. our backend is like that one friend who reads all the boring stuff and just tells you the lit parts.
 
